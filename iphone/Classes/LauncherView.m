@@ -83,7 +83,8 @@ static const NSTimeInterval kLauncherViewFastTransitionDuration = 0.2;
 		scrollView.scrollsToTop = NO;
 		scrollView.showsVerticalScrollIndicator = NO;
 		scrollView.showsHorizontalScrollIndicator = NO;
-		scrollView.alwaysBounceHorizontal = YES;
+		// scrollView.alwaysBounceHorizontal = YES; // (dp edit)
+		scrollView.alwaysBounceHorizontal = NO; // (dp edit)
 		scrollView.pagingEnabled = YES;
 		scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
 		scrollView.delaysContentTouches = NO;
@@ -91,6 +92,7 @@ static const NSTimeInterval kLauncherViewFastTransitionDuration = 0.2;
 		[self addSubview:scrollView];
 		
 		pager = [[UIPageControl alloc] init];
+		pager.hidesForSinglePage = YES; // (dp edit)
 		pager.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin|UIViewAutoresizingFlexibleRightMargin|UIViewAutoresizingFlexibleBottomMargin;
 		[pager addTarget:self action:@selector(pageChanged) forControlEvents:UIControlEventValueChanged];
 		[self addSubview:pager];

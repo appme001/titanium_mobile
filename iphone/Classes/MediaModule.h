@@ -27,7 +27,8 @@
 	UIImagePickerController *picker;
 	BOOL autoHidePicker;
 	BOOL saveToRoll;
-
+	BOOL isVideoPicker; // (dp edit)
+	
 	// Music picker
 	MPMediaPickerController* musicPicker;
 	

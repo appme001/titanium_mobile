@@ -246,6 +246,10 @@
     if (!local && imageData != nil) {
         NSFileManager* fm = [NSFileManager defaultManager];
         NSString* path = localPath;
+        
+        /*
+        // comment this out!
+        // (dp edit)
         if (hires) {
             if ([TiUtils isRetinaHDDisplay]) { // Save as @3x w/retina-hd
                 path = [NSString stringWithFormat:@"%@@3x.%@", [localPath stringByDeletingPathExtension], [localPath pathExtension]];
@@ -253,6 +257,7 @@
                 path = [NSString stringWithFormat:@"%@@2x.%@", [localPath stringByDeletingPathExtension], [localPath pathExtension]];
             }
         }
+        */
         
         if ([fm isDeletableFileAtPath:path]) {
             [fm removeItemAtPath:path error:nil];

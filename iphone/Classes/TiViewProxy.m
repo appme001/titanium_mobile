@@ -167,11 +167,14 @@
 		DeveloperLog(@"[WARN] 'add' and 'insertAt' must be contain a view. Returning");
 		return;
 	}
-
+	
+	// (dp edit)
+	/*
 	if ([childView conformsToProtocol:@protocol(TiWindowProtocol)]) {
 		DebugLog(@"[WARN] Can not add a window as a child of a view. Returning");
 		return;
 	}
+	*/
 
 	if (children==nil) {
 		children = [[NSMutableArray alloc] init];
@@ -1378,20 +1381,28 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 	[destroyLock lock];
 	if (view!=nil)
 	{
-		[self viewWillDetach];
-		// hold the view during detachment -- but we can't release it immediately.
-        // What if it (or a superview or subview) is in the middle of an animation?
-        // We probably need to be even MORE careful here.
-		[[view retain] autorelease];
-		view.proxy = nil;
-		if (self.modelDelegate!=nil && [self.modelDelegate respondsToSelector:@selector(detachProxy)])
-		{
-			[self.modelDelegate detachProxy];
+		// (dp edit)
+		NSString *className = [[self class] description];
+	
+		if([className isEqualToString:@"TiUIListViewProxy"] && [self _hasListeners:@"ignoreDetach"]) {
+			// do not release
 		}
-		self.modelDelegate = nil;
-		[view removeFromSuperview];
-		RELEASE_TO_NIL(view);
-		[self viewDidDetach];
+		else {
+			[self viewWillDetach];
+			// hold the view during detachment -- but we can't release it immediately.
+			// What if it (or a superview or subview) is in the middle of an animation?
+			// We probably need to be even MORE careful here.
+			[[view retain] autorelease];
+			view.proxy = nil;
+			if (self.modelDelegate!=nil && [self.modelDelegate respondsToSelector:@selector(detachProxy)])
+			{
+				[self.modelDelegate detachProxy];
+			}
+			self.modelDelegate = nil;
+			[view removeFromSuperview];
+			RELEASE_TO_NIL(view);
+			[self viewDidDetach];
+		}
 	}
 
     [[self children] makeObjectsPerformSelector:@selector(detachView)];
@@ -2662,7 +2673,7 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
 	if ([[child view] animating])
 	{
 		// changing the layout while animating is bad, ignore for now
-		DebugLog(@"[WARN] New layout set while view %@ animating: Will relayout after animation.", child);
+		// DebugLog(@"[WARN] New layout set while view %@ animating: Will relayout after animation.", child); // (dp edit)
 	}
 	else
 	{
