@@ -50,7 +50,8 @@ USE_PROXY_FOR_VERIFY_AUTORESIZING
 		if (type == -1)
 		{
 			//TODO: this is not the way to abstract pickers, note the cast I had to add to the following line
-			picker = (UIControl*)[[UIPickerView alloc] initWithFrame:CGRectMake(0, 0, 320, 228)];
+			// picker = (UIControl*)[[UIPickerView alloc] initWithFrame:CGRectMake(0, 0, 320, 228)]; // (dp edit)
+			picker = (UIControl*)[[UIPickerView alloc] initWithFrame:CGRectMake(0, 0, 320, 162)]; // (dp edit)
 			((UIPickerView*)picker).delegate = self;
 			((UIPickerView*)picker).dataSource = self;
 		}
@@ -61,7 +62,8 @@ USE_PROXY_FOR_VERIFY_AUTORESIZING
 			[(UIDatePicker*)picker setDatePickerMode:type];
 			[picker addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
 		}
-		[picker setBackgroundColor:[UIColor whiteColor]];
+		// [picker setBackgroundColor:[UIColor whiteColor]]; // (dp edit)
+		[picker setBackgroundColor:[UIColor clearColor]]; // (dp edit)
 		[self addSubview:picker];
 	}
 	return picker;

@@ -721,12 +721,13 @@ NSString *HTMLTextEncodingNameForStringEncoding(NSStringEncoding encoding)
     [[self proxy] replaceValue:urlAbs forKey:@"url" notification:NO];
 	
     if ([self.proxy _hasListeners:@"load"]) {
-        if (![urlAbs isEqualToString:lastValidLoad]) {
+        // (dp edit, ignore same url)
+        // if (![urlAbs isEqualToString:lastValidLoad]) {
             NSDictionary *event = url == nil ? nil : [NSDictionary dictionaryWithObject:[self url] forKey:@"url"];
             [self.proxy fireEvent:@"load" withObject:event];
             [lastValidLoad release];
             lastValidLoad = [urlAbs retain];
-        }
+        // }
     }
     [webView setNeedsDisplay];
     ignoreNextRequest = NO;

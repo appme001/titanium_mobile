@@ -381,6 +381,18 @@ void CMExternalChangeCallback (ABAddressBookRef notifyAddressBook,CFDictionaryRe
 	return groups;
 }
 
+// (dp edit)
+-(NSNumber*)getDefaultSortOrder:(id)unused
+{
+	return NUMINT(ABPersonGetSortOrdering());
+}
+
+// (dp edit)
+-(NSNumber*)getDefaultNameFormat:(id)unused
+{
+	return NUMINT(ABPersonGetCompositeNameFormat());
+}
+
 -(TiContactsPerson*)createPerson:(id)arg
 {
     ENSURE_SINGLE_ARG_OR_NIL(arg, NSDictionary)

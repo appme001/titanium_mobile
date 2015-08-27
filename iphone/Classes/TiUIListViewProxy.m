@@ -498,6 +498,67 @@
     }, NO);
 }
 
+// (dp edit)
+-(NSNumber*)getIndexByName:(id)args
+{
+    ENSURE_SINGLE_ARG(args,NSString);
+    
+    int c = 0;
+    
+    for (TiUIListSectionProxy *section in _sections)
+    {
+        for (NSDictionary *item in [section items])
+        {
+            id propertiesValue = [item objectForKey:@"properties"];
+            NSDictionary *properties = ([propertiesValue isKindOfClass:[NSDictionary class]]) ? propertiesValue : nil;
+            
+            if ([args isEqualToString:[properties objectForKey:@"name"]])
+            {
+                return NUMINT(c);
+            }
+            c++;
+        }
+    }
+    return NUMINT(-1);
+}
+
+// (dp edit)
+-(NSMutableDictionary*)getSectionAndIndexByName:(id)args
+{
+    ENSURE_SINGLE_ARG(args,NSString);
+    
+    int sectionIndex = -1;
+    int itemIndex = 0;
+    
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    
+    for (TiUIListSectionProxy *section in _sections)
+    {
+        sectionIndex++;
+        itemIndex = 0;
+        
+        for (NSDictionary *item in [section items])
+        {
+            id propertiesValue = [item objectForKey:@"properties"];
+            NSDictionary *properties = ([propertiesValue isKindOfClass:[NSDictionary class]]) ? propertiesValue : nil;
+            
+            if ([args isEqualToString:[properties objectForKey:@"name"]])
+            {
+                [dict setObject:NUMINT(sectionIndex) forKey:@"sectionIndex"];
+                [dict setObject:NUMINT(itemIndex) forKey:@"itemIndex"];
+                
+                return dict;
+            }
+            itemIndex++;
+        }
+    }
+    
+    [dict setObject:NUMINT(-1) forKey:@"sectionIndex"];
+    [dict setObject:NUMINT(-1) forKey:@"itemIndex"];
+    
+    return dict;
+}
+
 #pragma mark - Marker Support
 
 -(NSIndexPath*)indexPathFromDictionary:(NSDictionary*) args

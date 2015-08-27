@@ -306,6 +306,11 @@ DEFINE_EXCEPTIONS
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
 {
+	// (dp edit)
+	NSUInteger tabIndex = [tabBarController.viewControllers indexOfObject:viewController];
+	NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys: NUMINT(tabIndex), @"index", nil];
+	[self.proxy fireEvent:@"click" withObject:event];
+	
 	if ([tabBarController moreNavigationController] == viewController)
 	{
 		if (self != [(UINavigationController *)viewController delegate])
