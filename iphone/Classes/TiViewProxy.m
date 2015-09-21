@@ -1389,20 +1389,27 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 	[destroyLock lock];
 	if (view!=nil)
 	{
-		[self viewWillDetach];
-		// hold the view during detachment -- but we can't release it immediately.
-        // What if it (or a superview or subview) is in the middle of an animation?
-        // We probably need to be even MORE careful here.
-		[[view retain] autorelease];
-		view.proxy = nil;
-		if (self.modelDelegate!=nil && [self.modelDelegate respondsToSelector:@selector(detachProxy)])
-		{
-			[self.modelDelegate detachProxy];
-		}
-		self.modelDelegate = nil;
-		[view removeFromSuperview];
-		RELEASE_TO_NIL(view);
-		[self viewDidDetach];
+        // (dp edit)
+        NSString *className = [[self class] description];
+        
+        if([className isEqualToString:@"TiUIListViewProxy"] && [self _hasListeners:@"ignoreDetach"]) {
+            // do not release
+        } else {
+            [self viewWillDetach];
+            // hold the view during detachment -- but we can't release it immediately.
+            // What if it (or a superview or subview) is in the middle of an animation?
+            // We probably need to be even MORE careful here.
+            [[view retain] autorelease];
+            view.proxy = nil;
+            if (self.modelDelegate!=nil && [self.modelDelegate respondsToSelector:@selector(detachProxy)])
+            {
+                [self.modelDelegate detachProxy];
+            }
+            self.modelDelegate = nil;
+            [view removeFromSuperview];
+            RELEASE_TO_NIL(view);
+            [self viewDidDetach];
+        }
 	}
 
     [[self children] makeObjectsPerformSelector:@selector(detachView)];

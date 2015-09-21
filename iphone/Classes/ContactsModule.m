@@ -189,45 +189,6 @@ void CMExternalChangeCallback (ABAddressBookRef notifyAddressBook,CFDictionaryRe
     NSString * error = nil;
     int code = 0;
     BOOL doPrompt = NO;
-#if IS_XCODE_7
-    if ([TiUtils isIOS9OrGreater]) {
-        CNAuthorizationStatus permissions = [CNContactStore authorizationStatusForEntityType:CNEntityTypeContacts];
-        switch (permissions) {
-            case CNAuthorizationStatusNotDetermined:
-                doPrompt = YES;
-                break;
-            case CNAuthorizationStatusAuthorized:
-                break;
-            case CNAuthorizationStatusDenied:
-                code = CNAuthorizationStatusDenied;
-                error = @"The user has denied access to the address book";
-                break;
-            case CNAuthorizationStatusRestricted:
-                code = CNAuthorizationStatusRestricted;
-                error = @"The user is unable to allow access to the address book";
-                break;
-            default:
-                break;
-        }
-        if (!doPrompt) {
-            NSDictionary * propertiesDict = [TiUtils dictionaryWithCode:code message:error];
-            NSArray * invocationArray = [[NSArray alloc] initWithObjects:&propertiesDict count:1];
-            
-            [callback call:invocationArray thisObject:self];
-            [invocationArray release];
-            return;
-        }
-        TiThreadPerformOnMainThread(^(){
-            CNContactStore *ourContactStore = [self contactStore];
-            [ourContactStore requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError *error) {
-                NSDictionary * propertiesDict = [TiUtils dictionaryWithCode:[error code] message:[TiUtils messageFromError:error]];
-                KrollEvent * invocationEvent = [[KrollEvent alloc] initWithCallback:callback eventObject:propertiesDict thisObject:self];
-                [[callback context] enqueue:invocationEvent];
-                RELEASE_TO_NIL(invocationEvent);
-            }];
-        }, NO);
-        return;
-    }
 #endif
     ABAuthorizationStatus permissions = ABAddressBookGetAuthorizationStatus();
     switch (permissions) {
@@ -684,6 +645,18 @@ void CMExternalChangeCallback (ABAddressBookRef notifyAddressBook,CFDictionaryRe
 	CFRelease(groupRefs);
 	
 	return groups;
+}
+
+// (dp edit)
+-(NSNumber*)getDefaultSortOrder:(id)unused
+{
+	return NUMINT(ABPersonGetSortOrdering());
+}
+
+// (dp edit)
+-(NSNumber*)getDefaultNameFormat:(id)unused
+{
+	return NUMINT(ABPersonGetCompositeNameFormat());
 }
 
 -(TiContactsPerson*)createPerson:(id)arg

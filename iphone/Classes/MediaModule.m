@@ -1407,6 +1407,7 @@ MAKE_SYSTEM_PROP(VIDEO_TIME_OPTION_EXACT,MPMovieTimeOptionExact);
 
     [picker setDelegate:self];
 
+    isVideoPicker = NO; // (dp edit)
     animatedPicker = YES;
     saveToRoll = NO;
     BOOL editable = NO;
@@ -1439,6 +1440,7 @@ MAKE_SYSTEM_PROP(VIDEO_TIME_OPTION_EXACT,MPMovieTimeOptionExact);
                 if ([[types objectAtIndex:c] isEqualToString:(NSString*)kUTTypeMovie])
                 {
                     movieRequired = YES;
+                    isVideoPicker = YES; // (dp edit)
                 }
                 else if ([[types objectAtIndex:c] isEqualToString:(NSString*)kUTTypeImage])
                 {
@@ -1551,6 +1553,17 @@ MAKE_SYSTEM_PROP(VIDEO_TIME_OPTION_EXACT,MPMovieTimeOptionExact);
         }
     } else {
         [self displayModalPicker:picker settings:args];
+    }
+}
+
+// (dp edit)
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    // NSLog(@"[INFO] UIImagePickerController: navigationController: %d", isVideoPicker);
+    // NSLog(@"[INFO] viewController.navigationItem.title: %@", viewController.navigationItem.title);
+    
+    if(isVideoPicker && ([viewController.navigationItem.title isEqualToString:@"Photos"] || [viewController.navigationItem.title isEqualToString:@"Fotos"])) {
+        [viewController.navigationItem setTitle:@"Videos"];
     }
 }
 

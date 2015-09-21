@@ -1010,7 +1010,7 @@ static TiViewProxy * FindViewProxyWithBindIdContainingPoint(UIView *view, CGPoin
         NSDictionary *theItem = [[theSection itemAtIndex:indexPath.row] retain];
         
         //Delete Data
-        [theSection deleteItemAtIndex:indexPath.row];
+        // [theSection deleteItemAtIndex:indexPath.row]; // (dp edit)
         
         //Fire the delete Event if required
         NSString *eventName = @"delete";
@@ -1023,6 +1023,9 @@ static TiViewProxy * FindViewProxyWithBindIdContainingPoint(UIView *view, CGPoin
                                                 nil];
             id propertiesValue = [theItem objectForKey:@"properties"];
             NSDictionary *properties = ([propertiesValue isKindOfClass:[NSDictionary class]]) ? propertiesValue : nil;
+            
+            [eventObject setObject:propertiesValue forKey:@"properties"]; // (dp edit)
+            
             id itemId = [properties objectForKey:@"itemId"];
             if (itemId != nil) {
                 [eventObject setObject:itemId forKey:@"itemId"];
@@ -1032,6 +1035,8 @@ static TiViewProxy * FindViewProxyWithBindIdContainingPoint(UIView *view, CGPoin
         }
         [theItem release];
         
+        // (dp edit)
+        /*
         BOOL emptySection = NO;
         
         if ([theSection itemCount] == 0) {
@@ -1104,6 +1109,8 @@ static TiViewProxy * FindViewProxyWithBindIdContainingPoint(UIView *view, CGPoin
         
         }
         [tableView endUpdates];
+        */
+        
         [theSection release];
     }
 }
@@ -1600,6 +1607,7 @@ static TiViewProxy * FindViewProxyWithBindIdContainingPoint(UIView *view, CGPoin
     NSIndexPath* realPath = [self pathForSearchPath:indexPath];
     
     id heightValue = [self valueWithKey:@"height" atIndexPath:realPath];
+    NSString *autoSizeText = [self valueWithKey:@"autoSizeText" atIndexPath:realPath]; // (dp edit)
     
     TiDimension height = _rowHeight;
     if (heightValue != nil) {
@@ -1607,7 +1615,105 @@ static TiViewProxy * FindViewProxyWithBindIdContainingPoint(UIView *view, CGPoin
     }
     if (TiDimensionIsDip(height)) {
         return height.value;
-    } else if (TiDimensionIsAutoSize(height)) {
+    }
+    else if(autoSizeText != nil) { // (dp edit)
+		NSString *autoSizeFontFamily = [self valueWithKey:@"autoSizeFontFamily" atIndexPath:realPath];
+		CGFloat autoSizeMaxWidthPortrait = [[self valueWithKey:@"autoSizeMaxWidthPortrait" atIndexPath:realPath] floatValue];
+		CGFloat autoSizeMaxWidthLandscape = [[self valueWithKey:@"autoSizeMaxWidthLandscape" atIndexPath:realPath] floatValue];
+		CGFloat autoSizeMinHeight = [[self valueWithKey:@"autoSizeMinHeight" atIndexPath:realPath] floatValue];
+		CGFloat autoSizePadding = [[self valueWithKey:@"autoSizePadding" atIndexPath:realPath] floatValue];
+		CGFloat autoSizeFontSize = [[self valueWithKey:@"autoSizeFontSize" atIndexPath:realPath] floatValue];
+
+		// NSLog(@"[INFO] autoSizeText: %@", autoSizeText);
+		
+		/*
+		NSLog(@"[INFO] autoSizeFontFamily: %@", autoSizeFontFamily);
+		
+		if([autoSizeFontFamily length] == 0) {
+			NSLog(@"[INFO] 0");
+		}
+		else {
+			NSLog(@"[INFO] 1");
+		}
+		*/
+	
+		UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+		
+		/*
+		NSString *orient;
+		switch(interfaceOrientation) {
+		   case UIInterfaceOrientationLandscapeRight:
+		       orient = @"UIInterfaceOrientationLandscapeRight";
+		       break;
+		   case UIInterfaceOrientationLandscapeLeft:
+		       orient = @"UIInterfaceOrientationLandscapeLeft";
+		       break;
+		   case UIInterfaceOrientationPortrait:
+		       orient = @"UIInterfaceOrientationPortrait";
+		       break;
+		   case UIInterfaceOrientationPortraitUpsideDown:
+		       orient = @"UIInterfaceOrientationPortraitUpsideDown";
+		       break;
+		   default: 
+		       orient = @"Invalid orientation";
+		}
+		NSLog(@"[INFO] interfaceOrientation: %@", orient);
+		*/
+		
+		CGFloat maxWidth = autoSizeMaxWidthPortrait;
+		
+		if(interfaceOrientation == UIInterfaceOrientationLandscapeRight || interfaceOrientation == UIInterfaceOrientationLandscapeLeft) {
+			// NSLog(@"[INFO] interfaceOrientation: Landscape");
+			maxWidth = autoSizeMaxWidthLandscape;	
+		}
+		else {
+			// NSLog(@"[INFO] interfaceOrientation: Portrait");
+		}
+		
+		CGSize constraint = CGSizeMake(maxWidth, 1000.0f);
+		CGSize size = CGSizeMake(100, 100);
+		
+		if([autoSizeFontFamily length] == 0) {
+			size = [autoSizeText sizeWithFont:[UIFont systemFontOfSize:autoSizeFontSize] constrainedToSize:constraint lineBreakMode:NSLineBreakByWordWrapping];
+		}
+		else {
+			size = [autoSizeText sizeWithFont:[UIFont fontWithName:autoSizeFontFamily size:autoSizeFontSize] constrainedToSize:constraint lineBreakMode:NSLineBreakByWordWrapping];
+		}
+				
+		CGFloat newHeight = MAX(size.height, autoSizeMinHeight);
+		
+		// NSLog(@"[INFO] size: %f", size);
+		// NSLog(@"[INFO] rowHeight: %f", newHeight + autoSizePadding);
+		
+		/*
+		NSString *autoSizeText2 = [self valueWithKey:@"autoSizeText2" atIndexPath:realPath];
+		
+		if(autoSizeText2 != nil) {
+			CGFloat autoSizeMaxWidthPortrait2 = [[self valueWithKey:@"autoSizeMaxWidthPortrait2" atIndexPath:realPath] floatValue];
+			CGFloat autoSizeMaxWidthLandscape2 = [[self valueWithKey:@"autoSizeMaxWidthLandscape2" atIndexPath:realPath] floatValue];
+			CGFloat autoSizeMinHeight2 = [[self valueWithKey:@"autoSizeMinHeight2" atIndexPath:realPath] floatValue];
+			CGFloat autoSizePadding2 = [[self valueWithKey:@"autoSizePadding2" atIndexPath:realPath] floatValue];
+			CGFloat autoSizeFontSize2 = [[self valueWithKey:@"autoSizeFontSize2" atIndexPath:realPath] floatValue];
+			
+			CGFloat maxWidth2 = autoSizeMaxWidthPortrait2;
+			
+			if(interfaceOrientation == UIInterfaceOrientationLandscapeRight || interfaceOrientation == UIInterfaceOrientationLandscapeLeft) {
+				maxWidth2 = autoSizeMaxWidthLandscape2;	
+			}
+			
+			CGSize constraint2 = CGSizeMake(maxWidth2, 1000.0f);
+			CGSize size2 = [autoSizeText2 sizeWithFont:[UIFont systemFontOfSize:autoSizeFontSize2] constrainedToSize:constraint2 lineBreakMode:NSLineBreakByWordWrapping];
+			CGFloat newHeight2 = MAX(size2.height, autoSizeMinHeight2);
+			
+			// NSLog(@"[INFO] height: %f, %f, %f, %f", newHeight, autoSizePadding, newHeight2, autoSizePadding2);
+			
+			return newHeight + autoSizePadding + newHeight2 + autoSizePadding2;
+		}
+		*/
+		
+		return newHeight + autoSizePadding;	
+    }
+    else if (TiDimensionIsAutoSize(height)) {
         TiUIListSectionProxy* theSection = [self.listViewProxy sectionForIndex:realPath.section];
         NSDictionary *item = [theSection itemAtIndex:realPath.row]; //get the item data
         id templateId = [item objectForKey:@"template"];
@@ -1662,6 +1768,16 @@ static TiViewProxy * FindViewProxyWithBindIdContainingPoint(UIView *view, CGPoin
 }
 
 #pragma mark - ScrollView Delegate
+
+// (dp edit)
+- (NSDictionary *) eventObjectForScrollView: (UIScrollView *) scrollView
+{
+	return [NSDictionary dictionaryWithObjectsAndKeys:
+			[TiUtils pointToDictionary:scrollView.contentOffset],@"contentOffset",
+			[TiUtils sizeToDictionary:scrollView.contentSize], @"contentSize",
+			[TiUtils sizeToDictionary:_tableView.bounds.size], @"size",
+			nil];
+}
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
@@ -1759,6 +1875,12 @@ static TiViewProxy * FindViewProxyWithBindIdContainingPoint(UIView *view, CGPoin
         isScrollingToTop = NO;
     } else {
         [self fireScrollEnd:(UITableView *)scrollView];
+    }
+    
+    // (dp edit)
+    if ([self.proxy _hasListeners:@"scrollEnd"])
+    {
+        [self.proxy fireEvent:@"scrollEnd" withObject:[self eventObjectForScrollView:scrollView]];
     }
 }
 

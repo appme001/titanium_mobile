@@ -49,6 +49,8 @@
 -(TiContactsPerson*)getPersonByID:(id)arg;
 -(NSArray*)getPeopleWithName:(id)arg;
 -(NSArray*)getAllPeople:(id)unused;
+-(NSNumber*)getDefaultSortOrder:(id)unused; // (dp edit)
+-(NSNumber*)getDefaultNameFormat:(id)unused; // (dp edit)
 -(TiContactsPerson*)createPerson:(id)arg;
 -(void)removePerson:(id)arg;
 

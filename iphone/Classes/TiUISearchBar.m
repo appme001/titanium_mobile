@@ -132,6 +132,11 @@
 	TiColor * newBarColor = [TiUtils colorValue:value];
 	UISearchBar *search = [self searchBar];
 	
+	// (dp edit)
+	UIColor *customColor = [newBarColor _color];
+	search.layer.borderWidth = 1;
+	search.layer.borderColor = customColor.CGColor;
+	
 	[search setBarStyle:[TiUtils barStyleForColor:newBarColor]];
 	[search setTranslucent:[TiUtils barTranslucencyForColor:newBarColor]];
 	UIColor* theColor = [TiUtils barColorForColor:newBarColor];
